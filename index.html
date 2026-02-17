@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바이브 코딩 - 느낌으로 만드는 소프트웨어</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #a78bfa;
+      --primary-dark: #5b21b6;
+      --accent: #f59e0b;
+      --bg: #0f0b1a;
+      --bg-card: #1a1428;
+      --text: #f1f0f5;
+      --text-muted: #a8a3b5;
+      --gradient: linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #f59e0b 100%);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      transition: background 0.3s;
+    }
+
+    nav.scrolled {
+      background: rgba(15, 11, 26, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--primary);
+      color: #fff !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      transition: background 0.3s, transform 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(124, 58, 237, 0.15);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      color: var(--primary-light);
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      letter-spacing: -1px;
+    }
+
+    .hero h1 .gradient-text {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 4px 25px rgba(124, 58, 237, 0.35);
+    }
+
+    .btn-primary:hover { box-shadow: 0 8px 35px rgba(124, 58, 237, 0.5); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary-light);
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-indicator span {
+      display: block;
+      width: 24px;
+      height: 24px;
+      border-bottom: 2px solid var(--primary-light);
+      border-right: 2px solid var(--primary-light);
+      transform: rotate(45deg);
+      opacity: 0.5;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+
+    /* ── Sections Common ── */
+    section { padding: 6rem 2rem; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      color: var(--primary-light);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.5px;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── About (바이브 코딩이란?) ── */
+    .about {
+      background: linear-gradient(180deg, var(--bg) 0%, #130f20 100%);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .code-block {
+      font-family: 'Fira Code', 'SF Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .code-comment { color: #6b7280; }
+    .code-keyword { color: #c084fc; }
+    .code-string { color: #34d399; }
+    .code-function { color: #60a5fa; }
+    .code-ai { color: #f59e0b; }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: var(--accent);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .about-content h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+      color: var(--primary-light);
+    }
+
+    .about-content p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    /* ── Features ── */
+    .features { background: #130f20; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124, 58, 237, 0.3);
+      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.1);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+      background: rgba(124, 58, 237, 0.12);
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    /* ── Curriculum ── */
+    .curriculum { background: var(--bg); }
+
+    .curriculum-list {
+      display: grid;
+      gap: 1rem;
+      counter-reset: curriculum;
+    }
+
+    .curriculum-item {
+      counter-increment: curriculum;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      padding: 1.5rem 2rem;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .curriculum-item:hover {
+      border-color: rgba(124, 58, 237, 0.3);
+      transform: translateX(4px);
+    }
+
+    .curriculum-number {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .curriculum-item h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .curriculum-item p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* ── CTA ── */
+    .cta {
+      text-align: center;
+      background: linear-gradient(180deg, var(--bg) 0%, #1a0f2e 100%);
+      padding: 6rem 2rem;
+    }
+
+    .cta-box {
+      background: var(--bg-card);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient);
+    }
+
+    .cta-box h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .cta-box p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-box .btn { font-size: 1.1rem; padding: 1rem 2.5rem; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* ── Animations (Intersection Observer) ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      section { padding: 4rem 1.25rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .cta-box { padding: 3rem 1.5rem; }
+      .curriculum-item { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="logo">VIBE CODING</div>
+    <ul class="nav-links">
+      <li><a href="#about">바이브 코딩이란</a></li>
+      <li><a href="#features">강의 특징</a></li>
+      <li><a href="#curriculum">커리큘럼</a></li>
+      <li><a href="https://forms.gle/Ddj742DqPZ5Eb8j79" target="_blank" rel="noopener" class="nav-cta">수강 신청</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="badge">2026 NEW COURSE</div>
+    <h1>
+      코드를 몰라도<br>
+      <span class="gradient-text">느낌으로 만드는 소프트웨어</span>
+    </h1>
+    <p>AI에게 말하면 코드가 완성됩니다. 바이브 코딩으로 아이디어를 현실로 만들어 보세요.</p>
+    <div class="hero-buttons">
+      <a href="https://forms.gle/Ddj742DqPZ5Eb8j79" target="_blank" rel="noopener" class="btn btn-primary">수강 신청하기 &rarr;</a>
+      <a href="#about" class="btn btn-outline">자세히 보기</a>
+    </div>
+    <div class="scroll-indicator"><span></span></div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-visual fade-up">
+          <div class="code-block">
+            <span class="code-comment">// 바이브 코딩: AI에게 말하듯 코딩하기</span><br><br>
+            <span class="code-ai">나:</span> <span class="code-string">"로그인 페이지를 만들어줘.<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;깔끔하고 모던한 디자인으로."</span><br><br>
+            <span class="code-ai">AI:</span> <span class="code-function">완성된 코드 생성 중...</span><span class="typing-cursor"></span><br><br>
+            <span class="code-keyword">결과</span>: 완벽한 로그인 페이지 완성 ✓
+          </div>
+        </div>
+        <div class="about-content fade-up">
+          <span class="section-label">What is Vibe Coding?</span>
+          <h2 class="section-title">바이브 코딩이란?</h2>
+          <p>바이브 코딩은 AI와 자연어 대화를 통해 소프트웨어를 만드는 새로운 개발 방식입니다. 복잡한 문법을 외울 필요 없이, 원하는 결과를 말로 설명하면 AI가 코드를 작성합니다.</p>
+          <h3>왜 바이브 코딩인가?</h3>
+          <p>프로그래밍 경험이 없어도, 여러분의 아이디어를 직접 구현할 수 있습니다. 기획자, 디자이너, 마케터, 창업가 등 누구나 자신만의 프로덕트를 만들 수 있는 시대입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="features">
+    <div class="container">
+      <span class="section-label">Why This Course?</span>
+      <h2 class="section-title">강의 특징</h2>
+      <p class="section-desc">실무에 바로 적용할 수 있는 바이브 코딩 스킬을 체계적으로 배웁니다.</p>
+      <div class="features-grid">
+        <div class="feature-card fade-up">
+          <div class="feature-icon">💬</div>
+          <h3>자연어 기반 개발</h3>
+          <p>코드 대신 대화로 개발합니다. 원하는 기능을 말로 설명하면 AI가 코드를 작성합니다.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon">🚀</div>
+          <h3>빠른 프로토타이핑</h3>
+          <p>아이디어에서 프로토타입까지 빠르게 구현할 수 있습니다. MVP를 신속하게 만들어보세요.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon">🎯</div>
+          <h3>비전공자 맞춤</h3>
+          <p>프로그래밍 경험이 전혀 없어도 괜찮습니다. 기초부터 차근차근 안내합니다.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon">🛠️</div>
+          <h3>실전 프로젝트</h3>
+          <p>실제 서비스를 만들어보는 프로젝트를 통해 실전 감각을 키웁니다.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon">🤖</div>
+          <h3>최신 AI 도구 활용</h3>
+          <p>Claude, Cursor, Copilot 등 최신 AI 코딩 도구를 직접 사용해봅니다.</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon">📦</div>
+          <h3>배포까지 한 번에</h3>
+          <p>만든 서비스를 실제로 배포하는 과정까지 경험합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum -->
+  <section id="curriculum" class="curriculum">
+    <div class="container">
+      <span class="section-label">Curriculum</span>
+      <h2 class="section-title">커리큘럼</h2>
+      <p class="section-desc">단계별로 바이브 코딩의 핵심을 익혀갑니다.</p>
+      <div class="curriculum-list">
+        <div class="curriculum-item fade-up">
+          <div class="curriculum-number">1</div>
+          <div>
+            <h4>바이브 코딩 소개 &amp; 환경 세팅</h4>
+            <p>바이브 코딩의 개념을 이해하고, AI 코딩 도구를 설치 및 설정합니다.</p>
+          </div>
+        </div>
+        <div class="curriculum-item fade-up">
+          <div class="curriculum-number">2</div>
+          <div>
+            <h4>프롬프트 엔지니어링 기초</h4>
+            <p>AI에게 효과적으로 지시하는 방법을 배웁니다. 좋은 프롬프트와 나쁜 프롬프트의 차이를 이해합니다.</p>
+          </div>
+        </div>
+        <div class="curriculum-item fade-up">
+          <div class="curriculum-number">3</div>
+          <div>
+            <h4>웹사이트 만들기</h4>
+            <p>바이브 코딩으로 나만의 웹사이트를 처음부터 끝까지 만들어봅니다.</p>
+          </div>
+        </div>
+        <div class="curriculum-item fade-up">
+          <div class="curriculum-number">4</div>
+          <div>
+            <h4>웹 애플리케이션 개발</h4>
+            <p>사용자 인터랙션이 있는 동적 웹 애플리케이션을 제작합니다.</p>
+          </div>
+        </div>
+        <div class="curriculum-item fade-up">
+          <div class="curriculum-number">5</div>
+          <div>
+            <h4>실전 프로젝트 &amp; 배포</h4>
+            <p>나만의 서비스를 기획, 개발, 배포까지 완성합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-box fade-up">
+      <h2>지금 바로 시작하세요</h2>
+      <p>코딩을 몰라도 괜찮습니다. 바이브 코딩으로 여러분의 아이디어를 현실로 만들어보세요.</p>
+      <a href="https://forms.gle/Ddj742DqPZ5Eb8j79" target="_blank" rel="noopener" class="btn btn-primary">수강 신청하기 &rarr;</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 VIBE CODING. All rights reserved.</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Intersection Observer for fade-up animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    document.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
